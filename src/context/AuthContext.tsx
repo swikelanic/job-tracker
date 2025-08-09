@@ -1,0 +1,76 @@
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+
+interface AuthContextType {
+  user: string | null;
+  login: (username: string, password: string) => Promise<boolean>;
+  logout: () => void;
+  register?: (username: string, password: string) => Promise<boolean>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('loggedInUser');
+    if (storedUser) setUser(storedUser);
+  }, []);
+
+  const login = async (username: string, password: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`http://localhost:5000/users?username=${username}&password=${password}`);
+      const data = await res.json();
+      if (data.length > 0) {
+        setUser(username);
+        localStorage.setItem('loggedInUser', username);
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('loggedInUser');
+  };
+
+  // Optional registration function
+  const register = async (username: string, password: string): Promise<boolean> => {
+    try {
+      const checkRes = await fetch(`http://localhost:5000/users?username=${username}`);
+      const existingUsers = await checkRes.json();
+      if (existingUsers.length > 0) return false;
+
+      const createRes = await fetch(`http://localhost:5000/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      if (createRes.ok) {
+        setUser(username);
+        localStorage.setItem('loggedInUser', username);
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout, register }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

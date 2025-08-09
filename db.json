@@ -1,0 +1,48 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "admin",
+      "password": "admin"
+    },
+    {
+      "id": "ccf5",
+      "username": "Mpho",
+      "password": "Junior@12"
+    },
+    {
+      "id": "b09b",
+      "username": "Wamashudu",
+      "password": "Desme@22"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "881c",
+      "role": "Teacher",
+      "companyName": "Highlands Primary",
+      "location": "Cape Town",
+      "status": "Interviewed",
+      "dateApplied": "2015-05-30T00:00:00.000Z",
+      "details": ""
+    },
+    {
+      "id": "57e8",
+      "role": "Taxi Driver",
+      "companyName": "Mashobe",
+      "location": "Johannesburg",
+      "status": "Declined",
+      "dateApplied": "2025-08-09T14:13:35.935Z",
+      "details": ""
+    },
+    {
+      "id": "fc0b",
+      "role": "Developer",
+      "companyName": "MLAB",
+      "location": "Johannesburg",
+      "status": "Interviewed",
+      "dateApplied": "2025-08-09T14:53:29.611Z",
+      "details": ""
+    }
+  ]
+}
