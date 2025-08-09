@@ -9,6 +9,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// ✅ Use environment variable for base URL
+const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<string | null>(null);
 
@@ -19,7 +23,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
-      const res = await fetch(`http://localhost:5000/users?username=${username}&password=${password}`);
+      const res = await fetch(
+        `${API_BASE_URL}/users?username=${username}&password=${password}`
+      );
       const data = await res.json();
       if (data.length > 0) {
         setUser(username);
@@ -37,14 +43,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('loggedInUser');
   };
 
-  // Optional registration function
-  const register = async (username: string, password: string): Promise<boolean> => {
+  const register = async (
+    username: string,
+    password: string
+  ): Promise<boolean> => {
     try {
-      const checkRes = await fetch(`http://localhost:5000/users?username=${username}`);
+      const checkRes = await fetch(
+        `${API_BASE_URL}/users?username=${username}`
+      );
       const existingUsers = await checkRes.json();
       if (existingUsers.length > 0) return false;
 
-      const createRes = await fetch(`http://localhost:5000/users`, {
+      const createRes = await fetch(`${API_BASE_URL}/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
