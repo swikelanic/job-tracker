@@ -13,7 +13,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const API_BASE_URL =
   process.env.REACT_APP_API_BASE_URL ||
   (process.env.NODE_ENV === 'production'
-    ? 'https://your-backend-service.onrender.com' // <-- replace with your Render backend URL
+    ? 'https://job-tracker-api-ader.onrender.com' // <-- your Render backend URL here
     : 'http://localhost:5000');
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
