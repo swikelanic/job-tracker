@@ -9,11 +9,11 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// ✅ Automatically switch between local and production
+// Automatically switch between local and production backend URL
 const API_BASE_URL =
   process.env.REACT_APP_API_BASE_URL ||
   (process.env.NODE_ENV === 'production'
-    ? 'https://job-tracker-api-ader.onrender.com' // <-- your Render backend URL here
+    ? 'https://job-tracker-api-ader.onrender.com' // Your Render backend URL
     : 'http://localhost:5000');
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -59,14 +59,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password: string
   ): Promise<boolean> => {
     try {
-      // Check if user already exists
       const checkRes = await fetch(
         `${API_BASE_URL}/users?username=${encodeURIComponent(username)}`
       );
       const existingUsers = await checkRes.json();
       if (existingUsers.length > 0) return false;
 
-      // Create new user
       const createRes = await fetch(`${API_BASE_URL}/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
