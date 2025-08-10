@@ -9,9 +9,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// ✅ Use environment variable for base URL
+// ✅ Automatically switch between local and production
 const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+  process.env.REACT_APP_API_BASE_URL ||
+  (process.env.NODE_ENV === 'production'
+    ? 'https://your-backend-service.onrender.com' // <-- replace with your Render backend URL
+    : 'http://localhost:5000');
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<string | null>(null);
@@ -24,16 +27,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
       const res = await fetch(
-        `${API_BASE_URL}/users?username=${username}&password=${password}`
+        `${API_BASE_URL}/users?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
       );
+
+      if (!res.ok) {
+        console.error(`Login request failed: ${res.status} ${res.statusText}`);
+        return false;
+      }
+
       const data = await res.json();
       if (data.length > 0) {
         setUser(username);
         localStorage.setItem('loggedInUser', username);
         return true;
       }
+
       return false;
-    } catch {
+    } catch (error) {
+      console.error('Error during login:', error);
       return false;
     }
   };
@@ -48,24 +59,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     password: string
   ): Promise<boolean> => {
     try {
+      // Check if user already exists
       const checkRes = await fetch(
-        `${API_BASE_URL}/users?username=${username}`
+        `${API_BASE_URL}/users?username=${encodeURIComponent(username)}`
       );
       const existingUsers = await checkRes.json();
       if (existingUsers.length > 0) return false;
 
+      // Create new user
       const createRes = await fetch(`${API_BASE_URL}/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
+
       if (createRes.ok) {
         setUser(username);
         localStorage.setItem('loggedInUser', username);
         return true;
       }
       return false;
-    } catch {
+    } catch (error) {
+      console.error('Error during registration:', error);
       return false;
     }
   };
